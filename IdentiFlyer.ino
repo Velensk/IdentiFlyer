@@ -1,20 +1,18 @@
 /**
- *  ___ ___  _  _   _     ___  __  ___    ___ ___  ___
- * | __/ _ \| \| | /_\   ( _ )/  \( _ )  / __| _ \/ __|
- * | _| (_) | .` |/ _ \  / _ \ () / _ \ | (_ |  _/\__ \
- * |_| \___/|_|\_/_/ \_\ \___/\__/\___/  \___|_|  |___/
- *
- * This example is meant to work with the Adafruit
- * FONA 808 or 3G Shield or Breakout
- *
- * Copyright: 2015 Adafruit
- * Author: Todd Treece
- * Licence: MIT
+
+ * Copyright: Benjamin Bottorff
+ * Authkor: Benjamin Bottorff
+ * Licence: Free
  *
  */
 #include "Adafruit_FONA.h"
 
 /////////////////////////////////////////////////////////////////////////// HELPER
+
+inline const char * const BoolToString(bool b)
+{
+  return b ? "true" : "false";
+}
 
 void reverse(char *str, int len)
 {
@@ -97,7 +95,7 @@ void ftoa(float n, char *res, int afterpoint)
 
 // standard pins for the shield, adjust as necessary
 #define FONA_RX 2
-#define FONA_TX 3
+#define FONA_TX 9
 #define FONA_RST 4
 
 #define SERIAL_NUM 7
@@ -122,29 +120,29 @@ Adafruit_FONA fona = Adafruit_FONA(FONA_RST);
 
 void setup() {
 
-  while (! Serial);
-
-  Serial.begin(115200);
-  Serial.println(F("Adafruit FONA 808 & 3G GPS demo"));
-  Serial.println(F("Initializing FONA... (May take a few seconds)"));
-
+//  while (! Serial);
+//
+//  Serial.begin(115200);
+//  Serial.println(F("Adafruit FONA 808 & 3G GPS demo"));
+//  Serial.println(F("Initializing FONA... (May take a few seconds)"));
+//
   fonaSerial->begin(4800);
   if (! fona.begin(*fonaSerial)) {
-    Serial.println(F("Couldn't find FONA"));
+//    Serial.println(F("Couldn't find FONA"));
     while(1);
   }
-  Serial.println(F("FONA is OK"));
-  // Try to enable GPRS
-  
-
-  Serial.println(F("Enabling GPS..."));
+//  Serial.println(F("FONA is OK"));
+//  // Try to enable GPRS
+//  
+//
+//  Serial.println(F("Enabling GPS..."));
   fona.enableGPS(true);
 }
 
 //////////////////////////////////////////////////////////////////////////  LOOP
 
 void loop() {
-  delay(2000);
+  delay(50);
 
   float latitude, longitude, speed_kph, heading, speed_mph, altitude;
 
@@ -153,40 +151,40 @@ void loop() {
 
   if (gps_success) {
 
-    Serial.print("GPS lat:");
-    Serial.println(latitude, 6);
-    Serial.print("GPS long:");
-    Serial.println(longitude, 6);
-    Serial.print("GPS speed KPH:");
-    Serial.println(speed_kph);
-    Serial.print("GPS speed MPH:");
-    speed_mph = speed_kph * 0.621371192;
-    Serial.println(speed_mph);
-    Serial.print("GPS heading:");
-    Serial.println(heading);
-    Serial.print("GPS altitude:");
-    Serial.println(altitude);
+//    Serial.print("GPS lat:");
+//    Serial.println(latitude, 6);
+//    Serial.print("GPS long:");
+//    Serial.println(longitude, 6);
+//    Serial.print("GPS speed KPH:");
+//    Serial.println(speed_kph);
+//    Serial.print("GPS speed MPH:");
+//    speed_mph = speed_kph * 0.621371192;
+//    Serial.println(speed_mph);
+//    Serial.print("GPS heading:");
+//    Serial.println(heading);
+//    Serial.print("GPS altitude:");
+//    Serial.println(altitude);
 
   } else {
-    Serial.println("Waiting for FONA GPS 3D fix...");
+//    Serial.println("Waiting for FONA GPS 3D fix...");
   }
 
   // Fona 3G doesnt have GPRSlocation :/
   if ((fona.type() == FONA3G_A) || (fona.type() == FONA3G_E))
     return;
   // Check for network, then GPRS 
-  Serial.println(F("Checking for Cell network..."));
+//  Serial.println(F("Checking for Cell network..."));
   if (fona.getNetworkStatus() == 1) {
     // network & GPRS? Great! Print out the GSM location to compare
     boolean gsmloc_success = fona.getGSMLoc(&latitude, &longitude);
 
     if (gsmloc_success) {
-      Serial.print("GSMLoc lat:");
-      Serial.println(latitude, 6);
-      Serial.print("GSMLoc long:");
-      Serial.println(longitude, 6);
-      Serial.print("NetworkStatus:");
-      Serial.println(fona.getNetworkStatus());
+//      Serial.print("GSMLoc lat:");
+//      Serial.println(latitude, 6);
+//      Serial.print("GSMLoc long:");
+//      Serial.println(longitude, 6);
+//      Serial.print("NetworkStatus:");
+//      Serial.println(fona.getNetworkStatus());
       uint16_t statuscode;
         int16_t length;
         char url[80];
@@ -195,51 +193,37 @@ void loop() {
         char latitudeStr[9];
         char SerialNumberStr[25];
 
-        bool lat_sign=false;
-        bool long_sign=false;
+        bool lat_sign=true;
+        bool long_sign=true;
         //The following code exists because the method that converts floats to strings doesn't like negatives.
         if (latitude<0)
           {
             latitude *= -1;
-            lat_sign =true;
+            lat_sign =false;
           }
           if (longitude<0)
           {
             longitude *= -1;
-            long_sign =true;
+            long_sign =false;
           }
-
-        Serial.println("Co-ords");
-        Serial.println(latitude);
-        Serial.println(longitude);
+//
+//        Serial.println("Co-ords");
+//        Serial.println(latitude);
+//        Serial.println(longitude);
 
         ftoa(longitude, longtitudeStr, COORD_DIGITS);
         ftoa(latitude, latitudeStr, COORD_DIGITS);
 
-        Serial.println("Pre-signcheck");
-        Serial.println(longtitudeStr);
-        Serial.println(latitudeStr);
+//        Serial.println("Pre-signcheck");
+//        Serial.println(longtitudeStr);
+//        Serial.println(latitudeStr);
         char* temp = "-";
-        if (long_sign)
-          {
-            strcat(temp, longtitudeStr);
-            Serial.println("Temp,string");
-            Serial.println(temp);
-            Serial.println(longtitudeStr);
-            strcpy(longtitudeStr, temp);
-          }
-          temp = "-";
-          if (lat_sign)
-          {
-            strcat(temp, latitudeStr);
-            strcpy(longtitudeStr, temp);
-          }
-        delay(2);
-        Serial.println("Post signcheck");
-        Serial.println(longtitudeStr);
-        Serial.println(latitudeStr);
+        
+//        Serial.println("Post signcheck");
+//        Serial.println(longtitudeStr);
+//        Serial.println(latitudeStr);
         tostring(SerialNumberStr, SERIAL_NUM);
-        Serial.println(SerialNumberStr);
+//        Serial.println(SerialNumberStr);
         
         FONAFlashStringPtr contentType = FONAFlashStringPtr();
 
@@ -250,33 +234,36 @@ void loop() {
         strcat(data, longtitudeStr);
         strcat(data, "\", \"latitude\": \"");
         strcat(data, latitudeStr);
+        strcat(data, "\", \"latitude_is_positive\": \"");
+        strcat(data, BoolToString(lat_sign));
+        strcat(data, "\", \"longitude_is_positive\": \"");
+        strcat(data, BoolToString(long_sign));
         strcat(data, "\"}");
    
-        Serial.println(url);
-        Serial.println(data);
+//        Serial.println(url);
+//        Serial.println(data);
 
-        Serial.println(F("****"));
-        if (!fona.HTTP_POST_start("notifly.pompeii.dog/location/create/15", F("application/json"), (uint8_t *) data, strlen(data), &statuscode, (uint16_t *)&length)) {
-          Serial.println("Failed!");
+//        Serial.println(F("****"));
+        if (!fona.HTTP_POST_start(url, F("application/json"), (uint8_t *) data, strlen(data), &statuscode, (uint16_t *)&length)) {
+//          Serial.println("Failed!");
 
         }
         while (length > 0) {
           while (fona.available()) {
                                    char c = fona.read();
-                                   Serial.write(c);
+//                                   Serial.write(c);
                                    length--;
                                    }
                            }
           fona.HTTP_POST_end();
     }else {
-      Serial.println("GSM location failed...");
-      Serial.println(F("Disabling GPRS"));
+//      Serial.println("GSM location failed...");
+//      Serial.println(F("Disabling GPRS"));
       fona.enableGPRS(false);
-      Serial.println(F("Enabling GPRS"));
+//      Serial.println(F("Enabling GPRS"));
       if (!fona.enableGPRS(true)) {
-        Serial.println(F("Failed to turn GPRS on"));  
+//        Serial.println(F("Failed to turn GPRS on"));  
       }
     }
   }
 }
-
